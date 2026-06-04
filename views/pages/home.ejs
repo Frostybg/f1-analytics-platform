@@ -1,0 +1,75 @@
+<!-- ===================== HERO ===================== -->
+<section class="f1-hero">
+  <div class="container-fluid px-3 px-lg-4 py-5">
+    <div class="row align-items-center gy-4">
+      <div class="col-12 col-lg-7">
+        <span class="f1-eyebrow">Formula 1 Analytics Platform</span>
+        <h1 class="f1-hero-title mt-2">
+          Race data, <span class="f1-brand-accent">decoded.</span>
+        </h1>
+        <p class="f1-hero-lead">
+          Explore drivers, circuits and live-grade telemetry powered by the OpenF1 API.
+          Visualize speed, throttle, braking, gears and DRS the way the engineers see it.
+        </p>
+        <div class="d-flex flex-wrap gap-2 mt-3">
+          <a href="/telemetry" class="btn btn-f1-primary">Open Telemetry Center</a>
+          <a href="/about" class="btn btn-f1-outline">Learn more</a>
+        </div>
+      </div>
+      <div class="col-12 col-lg-5">
+        <div class="f1-hero-panel">
+          <span class="f1-pill">PHASE 1 &middot; SKELETON</span>
+          <p class="mb-0 mt-2 text-secondary small">
+            This dashboard currently shows demonstration data. Live OpenF1 data and the
+            remaining pages are added in later phases.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="container-fluid px-3 px-lg-4 pb-5">
+  <!-- ===================== SUMMARY CARDS ===================== -->
+  <section aria-label="Season summary" class="mb-4">
+    <div class="row g-3">
+      <% summaryCards.forEach(function (card) { %>
+        <div class="col-6 col-lg-3">
+          <div class="f1-stat-card f1-accent-<%= card.accent %>">
+            <span class="f1-stat-label"><%= card.label %></span>
+            <span class="f1-stat-value"><%= card.value %></span>
+          </div>
+        </div>
+      <% }); %>
+    </div>
+  </section>
+
+  <!-- ===================== EXAMPLE CHART ===================== -->
+  <section aria-label="Example telemetry chart">
+    <div class="f1-card">
+      <div class="f1-card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <div>
+          <h2 class="f1-card-title mb-0">Speed Trace</h2>
+          <p class="f1-card-subtitle mb-0">Example Chart.js component &middot; demonstration data</p>
+        </div>
+        <span class="f1-pill">DEMO</span>
+      </div>
+      <div class="f1-card-body">
+        <!-- The chart reads its data from the data-chart attribute so the
+             server stays the single source of truth for the dataset. -->
+        <div class="f1-chart-wrap">
+          <canvas
+            id="demoSpeedChart"
+            data-chart='<%- JSON.stringify(demoChart) %>'
+            aria-label="Demonstration speed-over-distance chart"
+            role="img"
+          ></canvas>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- Page-specific script: extracted by express-ejs-layouts and loaded after
+     Chart.js in the layout. -->
+<script src="/js/charts/exampleChart.js"></script>

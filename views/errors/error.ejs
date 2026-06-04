@@ -1,0 +1,17 @@
+<section class="container-fluid px-3 px-lg-4 py-5">
+  <div class="row justify-content-center">
+    <div class="col-12 col-lg-8 col-xl-6 text-center">
+      <div class="f1-error-code"><%= status %></div>
+      <h1 class="f1-hero-title fs-2 mt-2"><%= message %></h1>
+      <p class="text-secondary">
+        The page you requested could not be served. It may not exist yet
+        (several pages arrive in later phases) or an upstream error occurred.
+      </p>
+      <a href="/" class="btn btn-f1-primary mt-2">Back to Dashboard</a>
+
+      <% if (stack) { %>
+        <pre class="f1-error-stack text-start mt-4"><%= stack %></pre>
+      <% } %>
+    </div>
+  </div>
+</section>
