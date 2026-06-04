@@ -266,6 +266,136 @@ h1, h2, h3, h4, h5, h6 {
   word-break: break-word;
 }
 
+/* --------------------------- Page header --------------------------- */
+.f1-page-header {
+  border-bottom: 1px solid var(--f1-border);
+  background: linear-gradient(180deg, rgba(20, 20, 28, 0.6), transparent);
+}
+
+/* --------------------------- State blocks (loading/error/empty) ------ */
+.f1-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 50vh;
+  padding: 2rem 1rem;
+}
+.f1-spinner {
+  width: 3rem;
+  height: 3rem;
+  color: var(--f1-red);
+}
+.f1-state-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  font-family: var(--f1-font-display);
+  font-size: 2rem;
+  font-weight: 900;
+  color: var(--f1-text-muted);
+  background: var(--f1-surface);
+  border: 1px solid var(--f1-border);
+}
+.f1-state-icon--error {
+  color: var(--f1-red);
+  border-color: rgba(225, 6, 0, 0.5);
+  background: rgba(225, 6, 0, 0.12);
+}
+
+/* --------------------------- Driver cards --------------------------- */
+.f1-driver-card {
+  --team-colour: var(--f1-red);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--f1-surface);
+  border: 1px solid var(--f1-border);
+  border-radius: var(--f1-radius);
+  border-top: 3px solid var(--team-colour);
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.f1-driver-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--team-colour);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5);
+}
+
+.f1-driver-number {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.75rem;
+  font-family: var(--f1-font-display);
+  font-weight: 900;
+  font-size: 2.4rem;
+  line-height: 1;
+  color: var(--team-colour);
+  opacity: 0.85;
+  z-index: 1;
+}
+
+.f1-driver-photo {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  height: 150px;
+  background:
+    radial-gradient(circle at 50% 120%, color-mix(in srgb, var(--team-colour) 35%, transparent), transparent 70%),
+    var(--f1-bg-elevated);
+}
+.f1-driver-photo img {
+  height: 150px;
+  width: auto;
+  object-fit: contain;
+  object-position: bottom center;
+}
+.f1-driver-photo-fallback {
+  font-family: var(--f1-font-display);
+  font-weight: 900;
+  font-size: 2.5rem;
+  letter-spacing: 1px;
+  color: var(--f1-text);
+  opacity: 0.7;
+  align-self: center;
+}
+
+.f1-driver-body {
+  padding: 0.85rem 1rem 1rem;
+  border-top: 1px solid var(--f1-border);
+}
+.f1-driver-name {
+  font-family: var(--f1-font-display);
+  font-weight: 700;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.f1-driver-team {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 0.35rem;
+  font-size: 0.82rem;
+  color: var(--f1-text-muted);
+}
+.f1-team-dot {
+  flex: 0 0 auto;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--team-colour);
+}
+
 /* --------------------------- Footer --------------------------- */
 .f1-footer {
   border-top: 1px solid var(--f1-border);

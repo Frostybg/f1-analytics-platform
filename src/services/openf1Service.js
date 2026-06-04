@@ -43,6 +43,46 @@ function fetchResource(resource, params = {}) {
   return getJson(buildUrl(resource, params), { timeout: config.openF1.timeout });
 }
 
+const DEFAULT_TEAM_COLOUR = '888888';
+
+/**
+ * Map a raw OpenF1 driver record to a clean, view-friendly shape:
+ *  - camelCase keys
+ *  - `#`-prefixed team colour (OpenF1 returns it without the hash)
+ *  - safe fallbacks for missing photo/colour
+ */
+function normalizeDriver(raw) {
+  const colour = (raw.team_colour || DEFAULT_TEAM_COLOUR).replace('#', '');
+  return {
+    driverNumber: raw.driver_number ?? null,
+    fullName: raw.full_name || `${raw.first_name || ''} ${raw.last_name || ''}`.trim(),
+    nameAcronym: raw.name_acronym || null,
+    teamName: raw.team_name || 'Unknown Team',
+    teamColour: `#${colour}`,
+    headshotUrl: raw.headshot_url || null,
+    countryCode: raw.country_code || null,
+  };
+}
+
+/**
+ * Normalize, de-duplicate (by driver number) and sort a list of raw drivers.
+ * Sorted by team name, then by driver number for a tidy grid.
+ */
+function normalizeDrivers(rawList = []) {
+  const byNumber = new Map();
+  rawList.forEach((raw) => {
+    const driver = normalizeDriver(raw);
+    if (driver.driverNumber != null && !byNumber.has(driver.driverNumber)) {
+      byNumber.set(driver.driverNumber, driver);
+    }
+  });
+
+  return Array.from(byNumber.values()).sort((a, b) => {
+    const team = a.teamName.localeCompare(b.teamName);
+    return team !== 0 ? team : a.driverNumber - b.driverNumber;
+  });
+}
+
 /* ---------------------------------------------------------------------------
  * Public, semantic API
  * Each future page should add the methods it needs here.
@@ -69,6 +109,18 @@ const openf1Service = {
    */
   getDrivers(params = {}) {
     return fetchResource('drivers', params);
+  },
+
+  /**
+   * The current driver grid, normalized for display.
+   *
+   * OpenF1 returns drivers per session, so we use the special `latest`
+   * session key to get the most recent grid, then normalize, de-duplicate
+   * and sort. Used by the Drivers page.
+   */
+  async getCurrentDrivers() {
+    const raw = await fetchResource('drivers', { session_key: 'latest' });
+    return normalizeDrivers(Array.isArray(raw) ? raw : []);
   },
 
   /**
