@@ -58,8 +58,10 @@
     const col = document.createElement('div');
     col.className = 'col-6 col-md-4 col-lg-3 col-xxl-2';
 
-    const card = document.createElement('article');
+    const card = document.createElement('a');
     card.className = 'f1-driver-card h-100';
+    card.href = `/drivers/${driver.driverNumber}`;
+    card.setAttribute('aria-label', `${driver.fullName} details`);
     card.style.setProperty('--team-colour', driver.teamColour);
 
     const number = document.createElement('span');

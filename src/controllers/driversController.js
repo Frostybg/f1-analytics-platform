@@ -22,6 +22,44 @@ const driversController = {
     });
   },
 
+  async showDriverDetails(req, res, next) {
+    try {
+      const driverNumber = Number.parseInt(req.params.driverNumber, 10);
+      if (Number.isNaN(driverNumber)) {
+        const error = new Error('Invalid driver number.');
+        error.status = 404;
+        return next(error);
+      }
+
+      const driver = await openf1Service.getDriverByNumber(driverNumber);
+      if (!driver) {
+        const error = new Error(`Driver #${driverNumber} could not be found.`);
+        error.status = 404;
+        return next(error);
+      }
+
+      // Season data (standing + recent sessions) is supplementary: a failure
+      // still renders the page — those sections are simply hidden.
+      let recentSessions = [];
+      let standing = null;
+      try {
+        ({ recentSessions, standing } = await openf1Service.getDriverSeasonData(driverNumber));
+      } catch (err) {
+        logger.warn(`Season data unavailable for #${driverNumber}: ${err.message}`);
+      }
+
+      res.render('pages/driver-details', {
+        title: driver.fullName,
+        active: 'drivers',
+        driver,
+        recentSessions,
+        standing,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
   async getDriversData(req, res) {
     try {
       const drivers = await openf1Service.getCurrentDrivers();

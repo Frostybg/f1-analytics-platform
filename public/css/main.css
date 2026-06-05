@@ -318,6 +318,8 @@ h1, h2, h3, h4, h5, h6 {
   border: 1px solid var(--f1-border);
   border-radius: var(--f1-radius);
   border-top: 3px solid var(--team-colour);
+  color: var(--f1-text);
+  text-decoration: none;
   transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
 .f1-driver-card:hover {
@@ -394,6 +396,211 @@ h1, h2, h3, h4, h5, h6 {
   height: 10px;
   border-radius: 50%;
   background: var(--team-colour);
+}
+
+/* --------------------------- Section title --------------------------- */
+.f1-section-title {
+  font-family: var(--f1-font-display);
+  font-weight: 900;
+  font-size: 1.4rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* --------------------------- Driver details hero --------------------- */
+.f1-driver-hero {
+  --team-colour: var(--f1-red);
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid var(--f1-border);
+  background:
+    radial-gradient(circle at 80% 30%,
+      color-mix(in srgb, var(--team-colour) 30%, transparent), transparent 55%),
+    linear-gradient(180deg, var(--f1-bg-elevated), var(--f1-bg));
+}
+.f1-driver-hero::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 6px;
+  height: 100%;
+  background: var(--team-colour);
+}
+.f1-driver-hero-watermark {
+  position: absolute;
+  right: 2%;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--f1-font-display);
+  font-weight: 900;
+  font-size: clamp(10rem, 28vw, 22rem);
+  line-height: 1;
+  color: var(--team-colour);
+  opacity: 0.08;
+  pointer-events: none;
+  user-select: none;
+  z-index: 0;
+}
+.f1-driver-hero-name {
+  font-family: var(--f1-font-display);
+  font-weight: 900;
+  font-size: clamp(2.2rem, 6vw, 4.2rem);
+  line-height: 1.02;
+  text-transform: uppercase;
+}
+.f1-driver-hero-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+.f1-badge-number {
+  font-family: var(--f1-font-display);
+  font-weight: 900;
+  font-size: 1.05rem;
+  color: #fff;
+  background: var(--team-colour);
+  padding: 0.25rem 0.7rem;
+  border-radius: var(--f1-radius-sm);
+}
+.f1-badge-acronym {
+  font-family: var(--f1-font-display);
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: var(--f1-text);
+  border: 1px solid var(--f1-border);
+  padding: 0.25rem 0.7rem;
+  border-radius: var(--f1-radius-sm);
+}
+
+.f1-driver-hero-photo {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  height: 280px;
+}
+.f1-driver-hero-photo img {
+  height: 280px;
+  width: auto;
+  object-fit: contain;
+  object-position: bottom center;
+  filter: drop-shadow(0 18px 30px rgba(0, 0, 0, 0.55));
+}
+.f1-driver-hero-photo .f1-driver-photo-fallback {
+  align-self: center;
+  font-size: 5rem;
+}
+
+/* --------------------------- Stat card variants --------------------- */
+.f1-stat-value--sm { font-size: 1.15rem; }
+
+.f1-stat-card--championship::before {
+  background: var(--team-colour, var(--f1-red));
+}
+.f1-stat-card--championship {
+  background: color-mix(in srgb, var(--team-colour, var(--f1-red)) 10%, var(--f1-surface));
+  border-color: color-mix(in srgb, var(--team-colour, var(--f1-red)) 35%, var(--f1-border));
+}
+.f1-stat-card--championship .f1-stat-value {
+  color: color-mix(in srgb, var(--team-colour, var(--f1-red)) 80%, var(--f1-text));
+}
+
+/* --------------------------- Back button --------------------------- */
+.f1-btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--f1-font-display);
+  font-weight: 600;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--f1-text-muted);
+  text-decoration: none;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--f1-border);
+  border-radius: 999px;
+  padding: 0.4rem 0.9rem;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+.f1-btn-back:hover {
+  color: var(--f1-text);
+  border-color: var(--team-colour, var(--f1-red));
+  background: rgba(255, 255, 255, 0.07);
+}
+
+/* --------------------------- Recent sessions --------------------- */
+.f1-session-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.f1-session-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 0.25rem;
+  border-bottom: 1px solid var(--f1-border);
+}
+.f1-session-row:last-child { border-bottom: none; }
+
+.f1-session-main { display: flex; flex-direction: column; min-width: 0; }
+.f1-session-name {
+  font-family: var(--f1-font-display);
+  font-weight: 700;
+  font-size: 0.98rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.f1-session-sub {
+  font-size: 0.82rem;
+  color: var(--f1-text-muted);
+}
+
+.f1-session-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 0 0 auto;
+}
+.f1-session-points {
+  font-size: 0.82rem;
+  color: var(--f1-text-muted);
+  white-space: nowrap;
+}
+.f1-result-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 3rem;
+  font-family: var(--f1-font-display);
+  font-weight: 900;
+  font-size: 0.9rem;
+  color: var(--f1-text);
+  background: var(--f1-surface-2);
+  border: 1px solid var(--f1-border);
+  border-radius: var(--f1-radius-sm);
+  padding: 0.3rem 0.6rem;
+}
+.f1-result-badge.is-podium {
+  color: #0a0a0f;
+  background: var(--f1-amber);
+  border-color: var(--f1-amber);
+}
+.f1-result-badge.is-retirement {
+  color: var(--f1-red);
+  border-color: rgba(225, 6, 0, 0.5);
+  background: rgba(225, 6, 0, 0.12);
+}
+
+@media (max-width: 420px) {
+  .f1-session-points { display: none; }
 }
 
 /* --------------------------- Footer --------------------------- */

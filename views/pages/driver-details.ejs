@@ -1,0 +1,140 @@
+<!-- ===================== HERO ===================== -->
+<section class="f1-driver-hero" style="--team-colour: <%= driver.teamColour %>">
+  <span class="f1-driver-hero-watermark" aria-hidden="true">
+    <%= driver.driverNumber != null ? driver.driverNumber : '' %>
+  </span>
+
+  <div class="container-fluid px-3 px-lg-4 position-relative">
+    <a href="/drivers" class="f1-btn-back mt-3">
+      <span aria-hidden="true">&larr;</span> Back to Drivers
+    </a>
+
+    <div class="row align-items-center gy-4 py-4 py-lg-5">
+      <div class="col-12 col-lg-7 order-2 order-lg-1">
+        <span class="f1-eyebrow"><%= driver.teamName %></span>
+        <h1 class="f1-driver-hero-name mt-1"><%= driver.fullName %></h1>
+
+        <div class="f1-driver-hero-meta mt-3">
+          <span class="f1-badge-number">#<%= driver.driverNumber %></span>
+          <% if (driver.nameAcronym) { %>
+            <span class="f1-badge-acronym"><%= driver.nameAcronym %></span>
+          <% } %>
+          <span class="f1-driver-team">
+            <span class="f1-team-dot"></span>
+            <span><%= driver.teamName %></span>
+          </span>
+        </div>
+      </div>
+
+      <div class="col-12 col-lg-5 order-1 order-lg-2">
+        <div class="f1-driver-hero-photo">
+          <% if (driver.headshotUrl) { %>
+            <img
+              src="<%= driver.headshotUrl %>"
+              alt="<%= driver.fullName %>"
+              decoding="async"
+              onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
+            />
+            <span class="f1-driver-photo-fallback" style="display:none;"><%= driver.nameAcronym || '—' %></span>
+          <% } else { %>
+            <span class="f1-driver-photo-fallback" style="display:flex;"><%= driver.nameAcronym || '—' %></span>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="container-fluid px-3 px-lg-4 py-4">
+  <!-- ===================== STATISTICS ===================== -->
+  <section aria-label="Driver statistics" class="mb-4" style="--team-colour: <%= driver.teamColour %>">
+    <h2 class="f1-section-title mb-3">Statistics</h2>
+
+    <div class="row g-3">
+      <!-- Championship tiles (live data — only shown when available) -->
+      <% if (standing && standing.position != null) { %>
+        <div class="col-6 col-lg-3">
+          <div class="f1-stat-card f1-stat-card--championship">
+            <span class="f1-stat-label">Championship</span>
+            <span class="f1-stat-value">P<%= standing.position %></span>
+          </div>
+        </div>
+      <% } %>
+      <% if (standing && standing.points != null) { %>
+        <div class="col-6 col-lg-3">
+          <div class="f1-stat-card f1-stat-card--championship">
+            <span class="f1-stat-label">Points</span>
+            <span class="f1-stat-value"><%= standing.points %></span>
+          </div>
+        </div>
+      <% } %>
+
+      <!-- Identity tiles -->
+      <div class="col-6 col-lg-3">
+        <div class="f1-stat-card f1-accent-red">
+          <span class="f1-stat-label">Car Number</span>
+          <span class="f1-stat-value">#<%= driver.driverNumber %></span>
+        </div>
+      </div>
+      <% if (driver.nameAcronym) { %>
+        <div class="col-6 col-lg-3">
+          <div class="f1-stat-card f1-accent-cyan">
+            <span class="f1-stat-label">Driver Code</span>
+            <span class="f1-stat-value"><%= driver.nameAcronym %></span>
+          </div>
+        </div>
+      <% } %>
+      <div class="col-6 col-lg-3">
+        <div class="f1-stat-card f1-accent-amber">
+          <span class="f1-stat-label">Team</span>
+          <span class="f1-stat-value f1-stat-value--sm"><%= driver.teamName %></span>
+        </div>
+      </div>
+      <% if (driver.countryCode) { %>
+        <div class="col-6 col-lg-3">
+          <div class="f1-stat-card f1-accent-green">
+            <span class="f1-stat-label">Nationality</span>
+            <span class="f1-stat-value"><%= driver.countryCode %></span>
+          </div>
+        </div>
+      <% } %>
+    </div>
+  </section>
+
+  <!-- ===================== RECENT SESSIONS ===================== -->
+  <% if (recentSessions && recentSessions.length) { %>
+    <section aria-label="Recent sessions">
+      <div class="f1-card">
+        <div class="f1-card-header">
+          <h2 class="f1-card-title mb-0">Recent Sessions</h2>
+          <p class="f1-card-subtitle mb-0">Latest results from the current season</p>
+        </div>
+        <div class="f1-card-body">
+          <ul class="f1-session-list">
+            <% recentSessions.forEach(function (s) { %>
+              <li class="f1-session-row">
+                <div class="f1-session-main">
+                  <span class="f1-session-name"><%= s.location %> &middot; <%= s.sessionName %></span>
+                  <span class="f1-session-sub">
+                    <% if (s.countryName) { %><%= s.countryName %><% } %>
+                    <% if (s.date) { %>
+                      &middot; <%= new Date(s.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) %>
+                    <% } %>
+                  </span>
+                </div>
+                <div class="f1-session-meta">
+                  <% if (s.points != null && s.points > 0) { %>
+                    <span class="f1-session-points"><%= s.points %> pts</span>
+                  <% } %>
+                  <span class="f1-result-badge <%= s.isPodium ? 'is-podium' : (s.isRetirement ? 'is-retirement' : '') %>">
+                    <%= s.status %>
+                  </span>
+                </div>
+              </li>
+            <% }); %>
+          </ul>
+        </div>
+      </div>
+    </section>
+  <% } %>
+</div>
