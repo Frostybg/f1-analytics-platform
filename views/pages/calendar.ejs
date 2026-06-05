@@ -1,0 +1,145 @@
+<!-- ===================== HERO ===================== -->
+<section class="f1-hero">
+  <div class="container-fluid px-3 px-lg-4 py-4 py-lg-5">
+    <span class="f1-eyebrow">Formula 1 &middot; <%= year %> Season</span>
+    <h1 class="f1-hero-title mt-2">
+      Race <span class="f1-brand-accent">Calendar</span>
+    </h1>
+    <p class="f1-hero-lead">
+      <% if (summary.total > 0) { %>
+        <%= summary.completed %> of <%= summary.total %> race weekends completed
+        <% if (summary.nextRace) { %>
+          &mdash; next up: <strong><%= summary.nextRace.meetingName %></strong>
+        <% } %>
+      <% } else { %>
+        No calendar data available for <%= year %>.
+      <% } %>
+    </p>
+  </div>
+</section>
+
+<div class="container-fluid px-3 px-lg-4 py-4">
+
+  <!-- ===================== SUMMARY CARDS ===================== -->
+  <section aria-label="Season summary" class="mb-4">
+    <div class="row g-3">
+
+      <div class="col-6 col-lg-3">
+        <div class="f1-stat-card f1-accent-red">
+          <span class="f1-stat-label">Race Weekends</span>
+          <span class="f1-stat-value"><%= summary.total %></span>
+        </div>
+      </div>
+
+      <div class="col-6 col-lg-3">
+        <div class="f1-stat-card f1-accent-green">
+          <span class="f1-stat-label">Completed</span>
+          <span class="f1-stat-value"><%= summary.completed %></span>
+        </div>
+      </div>
+
+      <div class="col-6 col-lg-3">
+        <div class="f1-stat-card f1-accent-amber">
+          <span class="f1-stat-label">Remaining</span>
+          <span class="f1-stat-value"><%= summary.remaining %></span>
+        </div>
+      </div>
+
+      <div class="col-6 col-lg-3">
+        <div class="f1-stat-card f1-accent-cyan">
+          <span class="f1-stat-label">Next Race</span>
+          <% if (summary.nextRace) { %>
+            <div class="f1-next-race-content">
+              <% if (summary.nextRace.round != null) { %>
+                <span class="f1-next-race-round">Round <%= summary.nextRace.round %></span>
+              <% } %>
+              <span class="f1-stat-value f1-stat-value--sm">
+                <%= summary.nextRace.meetingName %>
+              </span>
+              <% if (summary.nextRace.dateRangeLabel) { %>
+                <span class="f1-next-race-date">
+                  <%= summary.nextRace.dateRangeLabel %>
+                </span>
+              <% } %>
+            </div>
+          <% } else { %>
+            <span class="f1-stat-value">&#8212;</span>
+          <% } %>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ===================== CALENDAR LIST ===================== -->
+  <section aria-label="Race calendar">
+
+    <% if (meetings.length === 0) { %>
+      <div class="f1-state">
+        <div class="f1-state-icon">&#8212;</div>
+        <p class="mt-3 text-secondary">No race weekends found for <%= year %>.</p>
+      </div>
+
+    <% } else { %>
+      <div class="f1-calendar-list">
+        <% meetings.forEach(function(meeting) { %>
+
+          <a
+            href="/race/<%= meeting.meetingKey %>"
+            class="f1-race-card<%= meeting.isCompleted ? ' f1-race-card--completed' : '' %><%= meeting.isNext ? ' f1-race-card--next' : '' %>"
+            aria-label="<%= meeting.meetingName %>"
+          >
+            <div class="f1-race-card-inner">
+
+              <!-- Round badge -->
+              <div class="f1-race-round" aria-hidden="true">
+                <span class="f1-race-round-label">Round</span>
+                <span class="f1-race-round-num">
+                  <%= String(meeting.round).padStart(2, '0') %>
+                </span>
+              </div>
+
+              <!-- Main content -->
+              <div class="f1-race-content">
+                <div class="d-flex align-items-center flex-wrap gap-2 mb-1">
+                  <h2 class="f1-race-name mb-0"><%= meeting.meetingName %></h2>
+                  <% if (meeting.isNext) { %>
+                    <span class="f1-race-status f1-race-status--next">Next Race</span>
+                  <% } else if (meeting.isCompleted) { %>
+                    <span class="f1-race-status f1-race-status--completed">Completed</span>
+                  <% } %>
+                </div>
+
+                <p class="f1-race-meta mb-0">
+                  <% if (meeting.circuitShortName) { %><%= meeting.circuitShortName %> &middot; <% } %>
+                  <%= meeting.countryName || meeting.location || '' %>
+                  <% if (meeting.dateRangeLabel) { %>&middot; <%= meeting.dateRangeLabel %><% } %>
+                </p>
+
+                <!-- Session badges -->
+                <% if (meeting.sessions.length > 0) { %>
+                  <div class="f1-race-sessions">
+                    <% meeting.sessions.forEach(function(s) { %>
+                      <span class="f1-session-badge <%=
+                        s.isRace        ? 'f1-session-badge--race'
+                        : s.isSprint    ? 'f1-session-badge--sprint'
+                        : s.isQualifying ? 'f1-session-badge--qualifying'
+                        : 'f1-session-badge--practice'
+                      %>"><%= s.sessionName %></span>
+                    <% }) %>
+                  </div>
+                <% } %>
+              </div>
+
+              <!-- Arrow -->
+              <div class="f1-race-arrow" aria-hidden="true">&#8594;</div>
+
+            </div>
+          </a>
+
+        <% }) %>
+      </div>
+    <% } %>
+
+  </section>
+</div>

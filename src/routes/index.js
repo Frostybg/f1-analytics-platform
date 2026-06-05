@@ -11,14 +11,15 @@
 const express = require('express');
 const homeRoutes = require('./homeRoutes');
 const driversRoutes = require('./driversRoutes');
+const calendarRoutes = require('./calendarRoutes');
 
 const router = express.Router();
 
 router.use('/', homeRoutes);
 router.use('/drivers', driversRoutes);
+router.use('/calendar', calendarRoutes);
 
 // Future phases (mount here as they are built):
-// router.use('/calendar', calendarRoutes);
 // router.use('/telemetry', telemetryRoutes);
 // router.use('/compare', compareRoutes);
 // router.use('/circuits', circuitRoutes);

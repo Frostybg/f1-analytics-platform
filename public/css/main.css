@@ -603,6 +603,198 @@ h1, h2, h3, h4, h5, h6 {
   .f1-session-points { display: none; }
 }
 
+/* --------------------------- Race Calendar ------------------------------ */
+.f1-calendar-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.f1-race-card {
+  display: block;
+  background: var(--f1-surface);
+  border: 1px solid var(--f1-border);
+  border-left: 4px solid var(--f1-border);
+  border-radius: var(--f1-radius);
+  color: var(--f1-text);
+  text-decoration: none;
+  transition: transform 0.15s ease, border-left-color 0.15s ease, box-shadow 0.15s ease;
+  overflow: hidden;
+}
+.f1-race-card:hover {
+  transform: translateY(-2px);
+  border-left-color: var(--f1-red);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  color: var(--f1-text);
+}
+.f1-race-card--next {
+  border-left-color: var(--f1-red);
+  background: color-mix(in srgb, var(--f1-red) 6%, var(--f1-surface));
+}
+.f1-race-card--completed { opacity: 0.6; }
+.f1-race-card--completed:hover { opacity: 0.85; }
+
+.f1-race-card-inner {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1.1rem 1.3rem;
+}
+
+/* Left: round badge */
+.f1-race-round {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  text-align: center;
+}
+.f1-race-round-label {
+  font-family: var(--f1-font-display);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--f1-text-muted);
+  line-height: 1;
+}
+.f1-race-round-num {
+  font-family: var(--f1-font-display);
+  font-size: 1.45rem;
+  font-weight: 900;
+  line-height: 1.1;
+  color: var(--f1-text);
+}
+
+/* Middle: content */
+.f1-race-content {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.f1-race-name {
+  font-family: var(--f1-font-display);
+  font-weight: 700;
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  line-height: 1.2;
+}
+.f1-race-meta {
+  font-size: 0.82rem;
+  color: var(--f1-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Status labels */
+.f1-race-status {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  font-family: var(--f1-font-display);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+}
+.f1-race-status--next {
+  color: var(--f1-red);
+  background: rgba(225, 6, 0, 0.12);
+  border-color: rgba(225, 6, 0, 0.4);
+}
+.f1-race-status--completed {
+  color: var(--f1-text-muted);
+  background: transparent;
+  border-color: var(--f1-border);
+}
+
+/* Session badge strip */
+.f1-race-sessions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.55rem;
+}
+.f1-session-badge {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--f1-font-display);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.9px;
+  text-transform: uppercase;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+.f1-session-badge--race {
+  color: var(--f1-red);
+  background: rgba(225, 6, 0, 0.14);
+  border-color: rgba(225, 6, 0, 0.4);
+}
+.f1-session-badge--sprint {
+  color: var(--f1-cyan);
+  background: rgba(46, 211, 224, 0.12);
+  border-color: rgba(46, 211, 224, 0.35);
+}
+.f1-session-badge--qualifying {
+  color: var(--f1-amber);
+  background: rgba(255, 184, 0, 0.12);
+  border-color: rgba(255, 184, 0, 0.35);
+}
+.f1-session-badge--practice {
+  color: var(--f1-text-muted);
+  background: transparent;
+  border-color: var(--f1-border);
+}
+
+/* Right: arrow */
+.f1-race-arrow {
+  flex: 0 0 auto;
+  font-size: 1.1rem;
+  color: var(--f1-text-muted);
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+.f1-race-card:hover .f1-race-arrow {
+  color: var(--f1-red);
+  transform: translateX(3px);
+}
+
+@media (max-width: 480px) {
+  .f1-race-round { display: none; }
+  .f1-race-meta { white-space: normal; }
+}
+
+/* Next Race card styling */
+.f1-next-race-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.f1-next-race-round {
+  display: block;
+  font-family: var(--f1-font-display);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--f1-cyan);
+  margin-bottom: 0.15rem;
+}
+.f1-next-race-date {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--f1-cyan);
+  margin-top: 0.25rem;
+}
+
 /* --------------------------- Footer --------------------------- */
 .f1-footer {
   border-top: 1px solid var(--f1-border);

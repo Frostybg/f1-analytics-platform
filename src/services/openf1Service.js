@@ -275,6 +275,135 @@ const openf1Service = {
   },
 
   /**
+   * Full calendar data for a season: meetings grouped with their sessions.
+   *
+   * Two API calls total (meetings + sessions for the year), all grouping and
+   * enrichment is done in memory so the page needs zero additional requests.
+   *
+   * Returned shape:
+   *   { meetings: Meeting[], summary: { total, completed, remaining, nextRace } }
+   *
+   * Each Meeting:
+   *   meetingKey, meetingName, location, countryName, circuitShortName,
+   *   dateStart (Date|null), dateEnd (Date|null), isCompleted, isNext,
+   *   round (1-based), sessions: Session[]
+   *
+   * Each Session:
+   *   sessionKey, sessionName, sessionType, dateStart,
+   *   isRace, isSprint, isQualifying, isSprintQualifying, isPractice
+   */
+  async getCalendarData(year) {
+    const [rawMeetings, rawSessions] = await Promise.all([
+      fetchResource('meetings', { year }),
+      fetchResource('sessions', { year }),
+    ]);
+
+    const meetings = Array.isArray(rawMeetings) ? rawMeetings : [];
+    const sessions = Array.isArray(rawSessions) ? rawSessions : [];
+    const now = Date.now();
+
+    // Index sessions by meeting_key, sorted chronologically
+    const sessionsByMeeting = new Map();
+    sessions.forEach((s) => {
+      const key = s.meeting_key;
+      if (!sessionsByMeeting.has(key)) sessionsByMeeting.set(key, []);
+      sessionsByMeeting.get(key).push(s);
+    });
+    sessionsByMeeting.forEach((list) =>
+      list.sort((a, b) => new Date(a.date_start) - new Date(b.date_start)),
+    );
+
+    function classifySession(s) {
+      const type = (s.session_type || '').trim();
+      const name = (s.session_name || s.session_type || 'Session').trim();
+      return {
+        sessionKey: s.session_key,
+        sessionName: name,
+        sessionType: type,
+        dateStart: s.date_start || null,
+        isRace: type === 'Race' && name !== 'Sprint',
+        isSprint: name === 'Sprint',
+        isQualifying: type === 'Qualifying' && name !== 'Sprint Qualifying',
+        isSprintQualifying: name === 'Sprint Qualifying',
+        isPractice: type === 'Practice',
+      };
+    }
+
+    // A genuine race weekend always contains at least one Race-type session.
+    // Pre-season testing meetings only have Practice sessions, so filtering
+    // on the presence of a Race session excludes them without needing to
+    // inspect meeting names.
+    const raceMeetingKeys = new Set(
+      sessions
+        .filter((s) => (s.session_type || '').trim() === 'Race')
+        .map((s) => s.meeting_key),
+    );
+
+    const normalizedMeetings = meetings
+      .filter((m) => m.meeting_key != null && raceMeetingKeys.has(m.meeting_key))
+      .sort((a, b) => new Date(a.date_start) - new Date(b.date_start))
+      .map((m, idx) => {
+        const sess = (sessionsByMeeting.get(m.meeting_key) || []).map(classifySession);
+
+        // Date range: earliest → latest session start time
+        const timestamps = sess
+          .map((s) => s.dateStart)
+          .filter(Boolean)
+          .map((d) => new Date(d).getTime());
+        const minTs = timestamps.length
+          ? Math.min(...timestamps)
+          : m.date_start ? new Date(m.date_start).getTime() : null;
+        const maxTs = timestamps.length ? Math.max(...timestamps) : minTs;
+
+        // Completed when the Race session start time is in the past
+        const raceSession = sess.find((s) => s.isRace);
+        const isCompleted = raceSession
+          ? Boolean(raceSession.dateStart && new Date(raceSession.dateStart).getTime() < now)
+          : maxTs !== null && maxTs < now;
+
+        return {
+          meetingKey: m.meeting_key,
+          meetingName: m.meeting_name || m.location || `Round ${idx + 1}`,
+          location: m.location || null,
+          countryName: m.country_name || null,
+          circuitShortName: m.circuit_short_name || null,
+          dateStart: minTs ? new Date(minTs) : null,
+          dateEnd: maxTs ? new Date(maxTs) : null,
+          isCompleted,
+          isNext: false,
+          sessions: sess,
+          round: idx + 1,
+        };
+      });
+
+    // Flag the first upcoming meeting as the "next" race
+    const nextIdx = normalizedMeetings.findIndex((m) => !m.isCompleted);
+    if (nextIdx >= 0) normalizedMeetings[nextIdx].isNext = true;
+
+    const completedCount = normalizedMeetings.filter((m) => m.isCompleted).length;
+    const nextMeeting = nextIdx >= 0 ? normalizedMeetings[nextIdx] : null;
+
+    return {
+      meetings: normalizedMeetings,
+      summary: {
+        total: normalizedMeetings.length,
+        completed: completedCount,
+        remaining: normalizedMeetings.length - completedCount,
+        nextRace: nextMeeting
+          ? {
+              meetingName: nextMeeting.meetingName,
+              location: nextMeeting.location,
+              countryName: nextMeeting.countryName,
+              round: nextMeeting.round,
+              dateStart: nextMeeting.dateStart,
+              dateEnd: nextMeeting.dateEnd,
+            }
+          : null,
+      },
+    };
+  },
+
+  /**
    * High-frequency car telemetry (speed, rpm, throttle, brake, gear, drs).
    * This is the data source for the Telemetry Center in a later phase.
    */
