@@ -772,7 +772,191 @@ h1, h2, h3, h4, h5, h6 {
   .f1-race-meta { white-space: normal; }
 }
 
-/* Next Race card styling */
+/* --------------------------- Race Details page -------------------------- */
+.f1-race-hero-section {
+  border-bottom: 1px solid var(--f1-border);
+  background:
+    radial-gradient(circle at 80% 50%, rgba(225, 6, 0, 0.1), transparent 55%),
+    linear-gradient(180deg, var(--f1-bg-elevated), var(--f1-bg));
+}
+
+/* Weekend schedule list */
+.f1-schedule-list { list-style: none; margin: 0; padding: 0; }
+.f1-schedule-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 1.3rem;
+  border-bottom: 1px solid var(--f1-border);
+}
+.f1-schedule-row:last-child { border-bottom: none; }
+.f1-schedule-row.is-completed { opacity: 0.55; }
+.f1-schedule-name {
+  font-family: var(--f1-font-display);
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+.f1-schedule-datetime { display: flex; flex-direction: column; align-items: flex-end; gap: 0.1rem; }
+.f1-schedule-day  { font-size: 0.82rem; color: var(--f1-text-muted); }
+.f1-schedule-time { font-family: var(--f1-font-display); font-size: 0.9rem; font-weight: 700; }
+
+/* Session selector dropdown */
+.f1-session-select {
+  appearance: none;
+  background: var(--f1-surface-2) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239a9aae' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 0.75rem center;
+  border: 1px solid var(--f1-border);
+  border-radius: var(--f1-radius-sm);
+  color: var(--f1-text);
+  font-family: var(--f1-font-display);
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 0.45rem 2.2rem 0.45rem 0.85rem;
+  cursor: pointer;
+  min-width: 14rem;
+  transition: border-color 0.15s ease;
+}
+.f1-session-select:focus { outline: none; border-color: var(--f1-red); }
+
+/* Results table */
+.f1-results-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+.f1-results-table thead th {
+  font-family: var(--f1-font-display);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--f1-text-muted);
+  padding: 0.65rem 1.1rem;
+  border-bottom: 1px solid var(--f1-border);
+  text-align: left;
+  background: var(--f1-bg-elevated);
+  white-space: nowrap;
+}
+.f1-results-table thead th.f1-col-num { text-align: right; }
+.f1-results-table tbody td {
+  padding: 0.75rem 1.1rem;
+  border-bottom: 1px solid var(--f1-border);
+  vertical-align: middle;
+}
+.f1-results-table tbody tr:last-child td { border-bottom: none; }
+.f1-results-table tbody tr:hover td { background: rgba(255, 255, 255, 0.025); }
+.f1-row-retirement td { opacity: 0.5; }
+.f1-col-num { text-align: right !important; }
+
+/* Expand / collapse toggle */
+.f1-results-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.6rem 1.1rem;
+  border-top: 1px solid var(--f1-border);
+}
+.f1-results-toggle-btn {
+  background: transparent;
+  border: 1px solid var(--f1-border);
+  border-radius: var(--f1-radius-sm);
+  color: var(--f1-text-muted);
+  font-family: var(--f1-font-display);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  padding: 0.4rem 1.1rem;
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.f1-results-toggle-btn:hover { color: var(--f1-text); border-color: var(--f1-red); }
+.f1-toggle-arrow { font-size: 0.6rem; margin-left: 0.35rem; }
+
+/* Driver cell */
+.f1-driver-cell { display: inline-flex; align-items: center; gap: 0.55rem; }
+.f1-driver-fullname {
+  font-family: var(--f1-font-display);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.2px;
+}
+.f1-driver-acronym {
+  font-size: 0.75rem;
+  color: var(--f1-text-muted);
+  font-family: var(--f1-font-display);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+/* ── Circuit section: horizontal 42/58 split ─────────────────────────── */
+.f1-circuit-section {
+  display: flex;
+  min-height: 260px;
+  overflow: hidden;
+}
+.f1-circuit-map {
+  flex: 0 0 42%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--f1-bg-elevated);
+  border-right: 1px solid var(--f1-border);
+  padding: 2rem 1.5rem;
+}
+.f1-circuit-img {
+  width: 100%;
+  max-width: 280px;
+  height: auto;
+  display: block;
+  object-fit: contain;
+}
+.f1-circuit-details {
+  flex: 1 1 58%;
+  padding: 1.5rem 1.6rem;
+  display: flex;
+  align-items: center;
+}
+.f1-circuit-details--full { flex: 1 1 100%; }
+.f1-circuit-dl { width: 100%; margin: 0; display: flex; flex-direction: column; gap: 0; }
+.f1-circuit-dl-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid var(--f1-border);
+}
+.f1-circuit-dl-row:last-child { border-bottom: none; }
+.f1-circuit-dl-row dt {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--f1-text-muted);
+  flex-shrink: 0;
+}
+.f1-circuit-dl-row dd {
+  font-family: var(--f1-font-display);
+  font-weight: 700;
+  font-size: 0.92rem;
+  text-align: right;
+  margin: 0;
+}
+
+@media (max-width: 640px) {
+  .f1-circuit-section { flex-direction: column; }
+  .f1-circuit-map {
+    flex: none;
+    border-right: none;
+    border-bottom: 1px solid var(--f1-border);
+    padding: 1.5rem;
+    min-height: 200px;
+  }
+  .f1-circuit-img { max-width: 200px; }
+  .f1-session-select { min-width: 100%; }
+}
+
+/* --------------------------- Next Race card styling --------------------- */
 .f1-next-race-content {
   display: flex;
   flex-direction: column;

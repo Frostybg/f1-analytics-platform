@@ -12,6 +12,7 @@ and Chart.js — no React, no TypeScript, no database.
 | `/drivers` | Done | Full 2026 driver grid — responsive cards with team colours and headshots |
 | `/drivers/:driverNumber` | Done | Driver detail page — hero, championship standing, points, recent sessions |
 | `/calendar` | Done | Race calendar — GP cards with session badges, summary stats, next-race highlight |
+| `/race/:meetingKey` | Done | Race details — schedule, live results table with session selector, circuit SVG |
 
 ## Tech stack
 
@@ -109,7 +110,6 @@ f1-analytics-platform/
 
 ## Planned pages (not yet implemented)
 
-- Race Details
 - Telemetry Center *(main feature — speed, RPM, throttle, brake, gear, DRS)*
 - Driver Comparison
 - Circuit Explorer

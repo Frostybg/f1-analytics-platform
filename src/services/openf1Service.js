@@ -404,6 +404,99 @@ const openf1Service = {
   },
 
   /**
+   * Core data for a single race weekend: the meeting record + all its
+   * sessions sorted chronologically. Two API calls.
+   *
+   * Returns null when meetingKey is not found.
+   */
+  async getRaceWeekendData(meetingKey) {
+    const [rawMeetings, rawSessions] = await Promise.all([
+      fetchResource('meetings', { meeting_key: meetingKey }),
+      fetchResource('sessions', { meeting_key: meetingKey }),
+    ]);
+
+    const meeting = Array.isArray(rawMeetings) && rawMeetings.length > 0
+      ? rawMeetings[0]
+      : null;
+    if (!meeting) return null;
+
+    const sessions = (Array.isArray(rawSessions) ? rawSessions : [])
+      .sort((a, b) => new Date(a.date_start) - new Date(b.date_start));
+
+    return { meeting, sessions };
+  },
+
+  /**
+   * Results for a single session, merged with driver info.
+   * Two API calls (session_result + drivers), both scoped to session_key.
+   *
+   * Sorted by finishing position; retirements (DNS/DSQ/DNF) appear last.
+   */
+  async getSessionResults(sessionKey) {
+    const [rawResults, rawDrivers] = await Promise.all([
+      fetchResource('session_result', { session_key: sessionKey }),
+      fetchResource('drivers', { session_key: sessionKey }),
+    ]);
+
+    const results = Array.isArray(rawResults) ? rawResults : [];
+    const drivers = Array.isArray(rawDrivers) ? rawDrivers : [];
+
+    // Build driver lookup by number so we can enrich each result row
+    const driverMap = new Map(drivers.map((d) => [d.driver_number, normalizeDriver(d)]));
+
+    return results
+      .map((r) => {
+        const driver = driverMap.get(r.driver_number) || {};
+        const isDns = Boolean(r.dns);
+        const isDsq = Boolean(r.dsq);
+        const isDnf = Boolean(r.dnf);
+        const status = isDns ? 'DNS' : isDsq ? 'DSQ' : isDnf ? 'DNF'
+          : r.position != null ? `P${r.position}` : '—';
+
+        // Handle duration which may be a number or an array (for qualifying)
+        let duration = null;
+        if (r.duration != null) {
+          if (Array.isArray(r.duration)) {
+            // For qualifying: use last available value (Q3 > Q2 > Q1)
+            for (let i = r.duration.length - 1; i >= 0; i--) {
+              if (r.duration[i] != null) {
+                duration = Number(r.duration[i]);
+                break;
+              }
+            }
+          } else {
+            duration = Number(r.duration);
+          }
+        }
+
+        return {
+          position: r.position ?? null,
+          driverNumber: r.driver_number ?? null,
+          fullName: driver.fullName || `#${r.driver_number}`,
+          nameAcronym: driver.nameAcronym || null,
+          teamName: driver.teamName || null,
+          teamColour: driver.teamColour || null,
+          points: typeof r.points === 'number' ? r.points : null,
+          laps: typeof r.number_of_laps === 'number' ? r.number_of_laps : null,
+          fastestLap: r.fastest_lap != null ? Number(r.fastest_lap) : null,
+          duration,
+          gapToLeader: r.gap_to_leader != null ? Number(r.gap_to_leader) : null,
+          dnf: isDnf,
+          dns: isDns,
+          dsq: isDsq,
+          status,
+        };
+      })
+      .sort((a, b) => {
+        // Classified finishers first, then retirements by driver number
+        if (a.position != null && b.position != null) return a.position - b.position;
+        if (a.position != null) return -1;
+        if (b.position != null) return 1;
+        return (a.driverNumber || 0) - (b.driverNumber || 0);
+      });
+  },
+
+  /**
    * High-frequency car telemetry (speed, rpm, throttle, brake, gear, drs).
    * This is the data source for the Telemetry Center in a later phase.
    */
