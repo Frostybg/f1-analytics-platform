@@ -11,6 +11,7 @@
 const express = require('express');
 const homeRoutes = require('./homeRoutes');
 const driversRoutes = require('./driversRoutes');
+const standingsRoutes = require('./standingsRoutes');
 const calendarRoutes = require('./calendarRoutes');
 const raceRoutes = require('./raceRoutes');
 
@@ -18,6 +19,7 @@ const router = express.Router();
 
 router.use('/', homeRoutes);
 router.use('/drivers', driversRoutes);
+router.use('/standings', standingsRoutes);
 router.use('/calendar', calendarRoutes);
 router.use('/race', raceRoutes);
 

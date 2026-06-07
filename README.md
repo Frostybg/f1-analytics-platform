@@ -25,25 +25,6 @@ and Chart.js — no React, no TypeScript, no database.
 
 No database, authentication, or front-end framework — by design.
 
-## Getting started
-
-```bash
-# 1. Install dependencies
-npm install
-
-# 2. Create your environment file
-copy .env.example .env      # Windows
-# cp .env.example .env       # macOS / Linux
-
-# 3. Run in development (auto-reload via nodemon)
-npm run dev
-
-# …or in production mode
-npm start
-```
-
-Then open <http://localhost:3000>.
-
 ## Environment variables
 
 All variables have safe defaults so the app runs without a `.env` file.

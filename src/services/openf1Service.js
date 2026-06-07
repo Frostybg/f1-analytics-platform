@@ -497,6 +497,116 @@ const openf1Service = {
   },
 
   /**
+   * Championship standings for the current season.
+   *
+   * Strategy mirrors getDriverSeasonData but aggregates all drivers in a
+   * single pass rather than filtering to one. Total request count:
+   *   2 (latest session + all sessions for the year)
+   *   + N (one session_result per completed race meeting)
+   *   + 1 (current driver grid for names / colours / headshots)
+   *
+   * Returned shape:
+   *   { driverStandings: DriverStanding[], teamStandings: TeamStanding[], year: number }
+   *
+   * DriverStanding:
+   *   position, driverNumber, fullName, nameAcronym, teamName,
+   *   teamColour, headshotUrl, countryCode, points
+   *
+   * TeamStanding:
+   *   position, teamName, teamColour, points
+   */
+  async getStandingsData() {
+    const latest = await fetchResource('sessions', { session_key: 'latest' });
+    const latestSession = Array.isArray(latest) && latest[0] ? latest[0] : null;
+    const year = latestSession ? latestSession.year : new Date().getFullYear();
+    const cutoff = latestSession && latestSession.date_start
+      ? new Date(latestSession.date_start).getTime()
+      : Date.now();
+
+    const all = await fetchResource('sessions', { year });
+    const pastSessions = (Array.isArray(all) ? all : [])
+      .filter((s) => !s.is_cancelled && s.date_start && new Date(s.date_start).getTime() <= cutoff);
+
+    const sessionMeta = new Map(pastSessions.map((s) => [s.session_key, s]));
+
+    // Deduplicated list of meeting keys that have at least one past session
+    const meetingKeys = [];
+    pastSessions.forEach((s) => {
+      if (!meetingKeys.includes(s.meeting_key)) meetingKeys.push(s.meeting_key);
+    });
+
+    // One session_result call per meeting (no driver filter → all drivers).
+    // Reuse the same batch already used by getDriverSeasonData so conceptually
+    // both pages pay the same cost.
+    const allResults = [];
+    for (const meetingKey of meetingKeys) {
+      try {
+        const rows = await fetchResource('session_result', { meeting_key: meetingKey });
+        if (Array.isArray(rows)) allResults.push(...rows);
+      } catch { /* skip failed meeting; degrade gracefully */ }
+    }
+
+    // Current driver grid supplies display info (name, colour, headshot).
+    const rawDrivers = await fetchResource('drivers', { session_key: 'latest' });
+    const driverInfoMap = new Map();
+    (Array.isArray(rawDrivers) ? rawDrivers : []).forEach((d) => {
+      const nd = normalizeDriver(d);
+      if (nd.driverNumber != null && !driverInfoMap.has(nd.driverNumber)) {
+        driverInfoMap.set(nd.driverNumber, nd);
+      }
+    });
+
+    // Sum points from Race-type sessions (covers both Race and Sprint).
+    const pointsByDriver = new Map();
+    allResults.forEach((result) => {
+      const meta = sessionMeta.get(result.session_key);
+      if (!meta || meta.session_type !== 'Race') return;
+      if (typeof result.points !== 'number') return;
+      pointsByDriver.set(
+        result.driver_number,
+        (pointsByDriver.get(result.driver_number) ?? 0) + result.points,
+      );
+    });
+
+    // Driver standings — sorted descending by points
+    const driverStandings = [...pointsByDriver.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .map(([driverNumber, points], idx) => {
+        const info = driverInfoMap.get(driverNumber) || {};
+        return {
+          position: idx + 1,
+          driverNumber,
+          fullName: info.fullName || `#${driverNumber}`,
+          nameAcronym: info.nameAcronym || null,
+          teamName: info.teamName || 'Unknown',
+          teamColour: info.teamColour || `#${DEFAULT_TEAM_COLOUR}`,
+          headshotUrl: info.headshotUrl || null,
+          countryCode: info.countryCode || null,
+          points,
+        };
+      });
+
+    // Team standings — sum each team's drivers, then sort descending
+    const teamPointsMap = new Map();
+    const teamColourMap = new Map();
+    driverStandings.forEach((d) => {
+      teamPointsMap.set(d.teamName, (teamPointsMap.get(d.teamName) ?? 0) + d.points);
+      if (!teamColourMap.has(d.teamName)) teamColourMap.set(d.teamName, d.teamColour);
+    });
+
+    const teamStandings = [...teamPointsMap.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .map(([teamName, points], idx) => ({
+        position: idx + 1,
+        teamName,
+        teamColour: teamColourMap.get(teamName) || `#${DEFAULT_TEAM_COLOUR}`,
+        points,
+      }));
+
+    return { driverStandings, teamStandings, year };
+  },
+
+  /**
    * High-frequency car telemetry (speed, rpm, throttle, brake, gear, drs).
    * This is the data source for the Telemetry Center in a later phase.
    */

@@ -1,0 +1,203 @@
+<!-- ===================== PAGE HEADER ===================== -->
+<section class="f1-page-header">
+  <div class="container-fluid px-3 px-lg-4 py-4">
+    <span class="f1-eyebrow"><%= year %> Season</span>
+    <h1 class="f1-hero-title fs-1 mb-0 mt-1">Standings</h1>
+    <p class="text-secondary mb-0">Formula 1 championship standings, powered by the OpenF1 API.</p>
+  </div>
+</section>
+
+<div class="container-fluid px-3 px-lg-4 py-4">
+
+  <!-- ===================== TABS ===================== -->
+  <div
+    class="f1-standings-tabs"
+    role="tablist"
+    aria-label="Standings type"
+  >
+    <button
+      id="tab-drivers"
+      class="f1-standings-tab is-active"
+      role="tab"
+      aria-selected="true"
+      aria-controls="panel-drivers"
+      data-panel="panel-drivers"
+    >Drivers</button>
+    <button
+      id="tab-teams"
+      class="f1-standings-tab"
+      role="tab"
+      aria-selected="false"
+      aria-controls="panel-teams"
+      data-panel="panel-teams"
+    >Teams</button>
+  </div>
+
+  <!-- ===================== STANDINGS CENTER ===================== -->
+  <div class="f1-standings-center">
+
+    <!-- ===================== DRIVERS PANEL ===================== -->
+    <div
+      id="panel-drivers"
+      class="f1-standings-panel"
+      role="tabpanel"
+      aria-labelledby="tab-drivers"
+    >
+    <div class="f1-card">
+      <div class="f1-card-header">
+        <h2 class="f1-card-title mb-0"><%= year %> Drivers&rsquo; Standings</h2>
+        <p class="f1-card-subtitle mb-0">
+          <%= driverStandings.length %> driver<%= driverStandings.length !== 1 ? 's' : '' %> &middot; points from Race and Sprint sessions
+        </p>
+      </div>
+
+      <% if (driverStandings.length === 0) { %>
+        <div class="f1-standings-empty">
+          <div class="f1-state-icon" aria-hidden="true">—</div>
+          <p class="mt-3 text-secondary mb-0">No standings data is available yet for this season.</p>
+        </div>
+      <% } else { %>
+        <div class="table-responsive">
+          <table class="f1-results-table f1-standings-table">
+            <thead>
+              <tr>
+                <th class="f1-col-num" scope="col">Pos.</th>
+                <th scope="col">Driver</th>
+                <th scope="col">Nat.</th>
+                <th scope="col">Team</th>
+                <th class="f1-col-num" scope="col">Pts</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% driverStandings.forEach(function(d) { %>
+                <tr class="<%= d.position <= 3 ? 'f1-standings-row--podium' : '' %>">
+                  <td class="f1-col-num f1-standings-pos">
+                    <span class="<%= d.position === 1 ? 'f1-pos--first' : (d.position === 2 ? 'f1-pos--second' : (d.position === 3 ? 'f1-pos--third' : '')) %>">
+                      <%= d.position %>
+                    </span>
+                  </td>
+                  <td>
+                    <div class="f1-driver-cell">
+                      <% if (d.headshotUrl) { %>
+                        <img
+                          src="<%= d.headshotUrl %>"
+                          alt="<%= d.fullName %>"
+                          class="f1-standings-headshot"
+                          decoding="async"
+                          onerror="this.style.display='none'"
+                        />
+                      <% } %>
+                      <div>
+                        <a href="/drivers/<%= d.driverNumber %>" class="f1-driver-fullname f1-link">
+                          <%= d.fullName %>
+                        </a>
+                        <% if (d.nameAcronym) { %>
+                          <span class="f1-driver-acronym d-none d-sm-inline ms-1"><%= d.nameAcronym %></span>
+                        <% } %>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="f1-standings-nat text-secondary">
+                    <%= d.countryCode || '—' %>
+                  </td>
+                  <td>
+                    <div class="f1-driver-team">
+                      <span class="f1-team-dot" style="background:<%= d.teamColour %>"></span>
+                      <span><%= d.teamName %></span>
+                    </div>
+                  </td>
+                  <td class="f1-col-num f1-standings-pts">
+                    <strong><%= d.points %></strong>
+                  </td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- ===================== TEAMS PANEL ===================== -->
+  <div
+    id="panel-teams"
+    class="f1-standings-panel"
+    role="tabpanel"
+    aria-labelledby="tab-teams"
+    hidden
+  >
+    <div class="f1-card">
+      <div class="f1-card-header">
+        <h2 class="f1-card-title mb-0"><%= year %> Teams&rsquo; Standings</h2>
+        <p class="f1-card-subtitle mb-0">
+          <%= teamStandings.length %> constructor<%= teamStandings.length !== 1 ? 's' : '' %> &middot; combined driver points
+        </p>
+      </div>
+
+      <% if (teamStandings.length === 0) { %>
+        <div class="f1-standings-empty">
+          <div class="f1-state-icon" aria-hidden="true">—</div>
+          <p class="mt-3 text-secondary mb-0">No standings data is available yet for this season.</p>
+        </div>
+      <% } else { %>
+        <div class="table-responsive">
+          <table class="f1-results-table f1-standings-table">
+            <thead>
+              <tr>
+                <th class="f1-col-num" scope="col">Pos.</th>
+                <th scope="col">Team</th>
+                <th class="f1-col-num" scope="col">Pts</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% teamStandings.forEach(function(t) { %>
+                <tr class="<%= t.position <= 3 ? 'f1-standings-row--podium' : '' %>">
+                  <td class="f1-col-num f1-standings-pos">
+                    <span class="<%= t.position === 1 ? 'f1-pos--first' : (t.position === 2 ? 'f1-pos--second' : (t.position === 3 ? 'f1-pos--third' : '')) %>">
+                      <%= t.position %>
+                    </span>
+                  </td>
+                  <td>
+                    <div class="f1-driver-team">
+                      <span class="f1-team-dot f1-team-dot--lg" style="background:<%= t.teamColour %>"></span>
+                      <span class="f1-driver-fullname"><%= t.teamName %></span>
+                    </div>
+                  </td>
+                  <td class="f1-col-num f1-standings-pts">
+                    <strong><%= t.points %></strong>
+                  </td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+      <% } %>
+    </div>
+  </div>
+
+  </div><!-- /f1-standings-center -->
+
+</div>
+
+<script>
+  (function () {
+    var tabs = document.querySelectorAll('.f1-standings-tab');
+    var panels = document.querySelectorAll('.f1-standings-panel');
+
+    tabs.forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        tabs.forEach(function (t) {
+          t.classList.remove('is-active');
+          t.setAttribute('aria-selected', 'false');
+        });
+        panels.forEach(function (p) {
+          p.hidden = true;
+        });
+
+        tab.classList.add('is-active');
+        tab.setAttribute('aria-selected', 'true');
+        document.getElementById(tab.dataset.panel).hidden = false;
+      });
+    });
+  }());
+</script>
